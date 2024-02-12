@@ -1,24 +1,24 @@
 import pandas
-import CORPSE_array
 import CORPSE_solvers
 from numpy import array,arange
 import copy
+
 
 # Initial pools for soil organic matter simulation
 # There are three kinds of chemically-defined C (Fast, slow, and microbial necromass). "Fast" has higher maximum decomposition rate and microbial CUE
 # Each C type can be in a protected or unprotected state. When protected, it is not subject to microbial decomposition
 SOM_init={'CO2': array(0.0),    # Cumulative CO2 from microbial respiration
- 'livingMicrobeC': array(0.06), # Active, living microbial biomass
- 'pFastC': array(1.97),         # Protected fast-decomposing C
- 'pNecroC': array(22.1),        # Protected microbial necromass C
- 'pSlowC': array(0.61),         # Protected slow-decomposing C
- 'uFastC': array(5.0),          # Unprotected fast-decomposing C
- 'uNecroC': array(0.19),        # Unprotected microbial necromass C
- 'uSlowC': array(8.25)}         # Unprotected slow-decomposing C
+ 'livingMicrobeC': array(0.012), # Active, living microbial biomass
+ 'pFastC': array(0.18),         # Protected fast-decomposing C
+ 'pNecroC': array(0.2),        # Protected microbial necromass C
+ 'pSlowC': array(0.6),         # Protected slow-decomposing C
+ 'uFastC': array(.1),          # Unprotected fast-decomposing C
+ 'uNecroC': array(.1),        # Unprotected microbial necromass C
+ 'uSlowC': array(99.0)}         # Unprotected slow-decomposing C
  
 # Parameters controlling the model
 params={
-    'vmaxref':{'Fast':9.0,'Slow':0.25,'Necro':4.5}, #  Relative maximum enzymatic decomp rates for each C type (year-1)
+    'vmaxref':{'Fast':19.0,'Slow':1.25,'Necro':10}, #  Relative maximum enzymatic decomp rates for each C type (year-1)
     'Ea':{'Fast':5e3,'Slow':30e3,'Necro':5e3},      # Activation energy (controls T dependence)
     'kC':{'Fast':0.01,'Slow':0.01,'Necro':0.01},    # Michaelis-Menton half saturation parameter (g microbial biomass/g substrate)
     'gas_diffusion_exp':0.6,  # Determines suppression of decomposition at high soil moisture
@@ -33,42 +33,64 @@ params={
 }
 
 # This makes an array of all the model time steps (in units of years). In this case, it starts at zero, ends at 120 days, and has a time step of one day
-t=arange(0,120/365,1.0/365)
+t=arange(0,90/365,1/365)
 
 # This section is setting up different initial values and parameters for different simulations representing microbial community traits
 # Here we set up an empty python dictionary to hold the different sets of parameters and initial values
 initvals={}
 paramsets={}
 
-# Resistant: Low biomass loss, fast growth
-initvals['Fast-growing survivor']=copy.deepcopy(SOM_init)      # Makes a copy of the default initial values. Need to use deepcopy so changing the value here doesn't change it for every simulation
-initvals['Fast-growing survivor']['livingMicrobeC']=array(1.0) # Start with a high amount of initial microbial biomass. Assumes this simulation starts right after the fire
-paramsets['Fast-growing survivor']=copy.deepcopy(params)
-paramsets['Fast-growing survivor']['vmaxref']['Fast']=10.0     # Higher potential decomposition rate for more labile C
+# Microbial community, no burn
+initvals['No burn']=copy.deepcopy(SOM_init)      # Makes a copy of the default initial values. Need to use deepcopy so changing the value here doesn't change it for every simulation
+paramsets['No burn']=copy.deepcopy(params)
+
+# # Microbial community, low severity burn
+# initvals['Low severity burn']=copy.deepcopy(SOM_init)      # Makes a copy of the default initial values. Need to use deepcopy so changing the value here doesn't change it for every simulation
+# initvals['Low severity burn']['livingMicrobeC']=array(0.01) # Start with low initial microbial biomass. Assumes this simulation starts right after the fire
+# paramsets['Low severity burn']=copy.deepcopy(params)
+# paramsets['Low severity burn']['vmaxref']['Fast']=20.0     # Higher potential decomposition rate for more labile C
+# paramsets['Low severity burn']['eup']['Fast'] = 0.2        # Lower CUE for ufastC and necromass
+# paramsets['Low severity burn']['eup']['Necro'] = 0.2
 
 
-
-# Susceptible: High biomass loss, slow growth
-initvals['Fire susceptible']=copy.deepcopy(SOM_init)
-initvals['Fire susceptible']['livingMicrobeC']=array(0.05)    # Low initial microbial biomass
-paramsets['Fire susceptible']=copy.deepcopy(params)
-paramsets['Fire susceptible']['vmaxref']['Fast']=6.0          # Slower maximum decomposition rate for labile C
-
-
-
-# Recovering: High biomass loss, fast growth
-initvals['Post-fire rebounder']=copy.deepcopy(SOM_init)
-initvals['Post-fire rebounder']['livingMicrobeC']=array(0.05) # Low initial microbial biomass
-paramsets['Post-fire rebounder']=copy.deepcopy(params)
-paramsets['Post-fire rebounder']['vmaxref']['Fast']=18.0      # Very fast potential decomposition/growth rate
+# # Resistant: Low biomass loss, fast growth
+# # Fast-growing survivor
+# initvals['Fast-growing survivor']=copy.deepcopy(SOM_init)      # Makes a copy of the default initial values. Need to use deepcopy so changing the value here doesn't change it for every simulation
+# initvals['Fast-growing survivor']['livingMicrobeC']=array(0.01) # Start with a high amount of initial microbial biomass. Assumes this simulation starts right after the fire
+# paramsets['Fast-growing survivor']=copy.deepcopy(params)
+# paramsets['Fast-growing survivor']['vmaxref']['Fast']=20.0     # Higher potential decomposition rate for more labile C
+# paramsets['Fast-growing survivor']['eup']['Fast'] = 0.2
+# paramsets['Fast-growing survivor']['eup']['Necro'] = 0.2
 
 
+# # Susceptible: High biomass loss, slow growth
+# # Fire susceptible
+# initvals['Fire susceptible']=copy.deepcopy(SOM_init)
+# initvals['Fire susceptible']['livingMicrobeC']=array(0.001)    # Low initial microbial biomass
+# paramsets['Fire susceptible']=copy.deepcopy(params)
+# paramsets['Fire susceptible']['vmaxref']['Fast']=0.2          # Slower maximum decomposition rate for labile C
+# paramsets['Fire susceptible']['eup']['Fast'] = 0.5
+# paramsets['Fire susceptible']['eup']['Necro'] = 0.5
 
-# Resilient: Low biomass loss, slow growth
-initvals['Slow-growing survivor']=copy.deepcopy(SOM_init)
-initvals['Slow-growing survivor']['livingMicrobeC']=array(1.0) # High initial microbial biomass
-paramsets['Slow-growing survivor']=copy.deepcopy(params)
-paramsets['Slow-growing survivor']['vmaxref']['Fast']=6.0      # Slower decomposition/growth rate
+
+# # Recovering: High biomass loss, fast growth
+# # Post-fire rebounder
+# initvals['Post-fire rebounder']=copy.deepcopy(SOM_init)
+# initvals['Post-fire rebounder']['livingMicrobeC']=array(0.001) # Low initial microbial biomass
+# paramsets['Post-fire rebounder']=copy.deepcopy(params)
+# paramsets['Post-fire rebounder']['vmaxref']['Fast']=20.0      # Very fast potential decomposition/growth rate
+# paramsets['Post-fire rebounder']['eup']['Fast'] = 0.2
+# paramsets['Post-fire rebounder']['eup']['Necro'] = 0.2
+
+
+# # Resilient: Low biomass loss, slow growth
+# # Slow-growing survivor
+# initvals['Slow-growing survivor']=copy.deepcopy(SOM_init)
+# initvals['Slow-growing survivor']['livingMicrobeC']=array(0.01) # High initial microbial biomass
+# paramsets['Slow-growing survivor']=copy.deepcopy(params)
+# paramsets['Slow-growing survivor']['vmaxref']['Fast']=0.2      # Slower decomposition/growth rate
+# paramsets['Slow-growing survivor']['eup']['Fast'] = 0.5
+# paramsets['Slow-growing survivor']['eup']['Necro'] = 0.5
 
 
 # Set up a data structure to hold the results of the different simulations
@@ -77,35 +99,5 @@ results={}
 # Simulations are assuming a constant temperature of 20 C and constant moisture of 60% of saturation
 # Inputs are empty because this is running as an incubation without any constant inputs of C
 for functype in initvals:
-    results[functype] = CORPSE_solvers.run_models_ODE(Tmin=20.0,Tmax=20.0,thetamin=0.6,thetamax=0.6,
+    results[functype] = CORPSE_solvers.run_models_ODE(Tmin=5.0,Tmax=20.0,thetamin=0.4,thetamax=0.9,
                                             times=t,inputs={},clay=20.0,initvals=initvals[functype],params=paramsets[functype])
-
-
-# This section plots the results
-# Each set of results should have the same set of pools as the initial values structure from the beginning of the simulation
-from matplotlib import pyplot
-
-fig,ax=pyplot.subplots(nrows=2,ncols=1,clear=True,num='CORPSE results')
-for sim in results:
-    totalC=CORPSE_array.sumCtypes(results[sim][0], 'u')+CORPSE_array.sumCtypes(results[sim][0], 'p')
-    ax[0].plot(t*365,results[sim][0]['CO2'].diff()/totalC[0]*100,label=sim)
-
-    # ax[1].plot(t*365,results[sim][0]['uFastC'],label='Simple')
-    # ax[1].plot(t*365,results[sim][0]['uSlowC'],label='Complex')
-    # ax[1].plot(t*365,results[sim][0]['uNecroC'],label='Necromass')
-
-    ax[1].plot(t*365,results[sim][0]['livingMicrobeC']/totalC[0]*100)
-
-ax[0].set_xlabel('Time (days)')
-ax[1].set_xlabel('Time (days)')
-# ax[2].set_xlabel('Time (days)')
-ax[0].set_ylabel('CO$_2$ flux rate (% initial C/day)')
-ax[1].set_ylabel('Microbial biomass (% initial C)')
-# ax[1].set_ylabel('SOM pools')
-# ax[1].legend()
-ax[0].legend(fontsize='medium')
-ax[0].set_title('CO$_2$ fluxes')
-ax[1].set_title('Microbial biomass')
-
-pyplot.show()
-
