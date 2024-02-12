@@ -47,7 +47,3 @@ fig,ax=pyplot.plot(t*365,TotalC_remaining[0])
 # Why is this linear? Because I've created a linear model in which the fractional
 # size of the fast and slow C pools doesn't depend on the previous timestep.
 
-# I should take what I learned hear and attempt to modify the CORPSE model to just
-# take fast and slow C pools as inputs. Maybe also temperature.
-
-
