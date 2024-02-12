@@ -100,4 +100,4 @@ results={}
 # Inputs are empty because this is running as an incubation without any constant inputs of C
 for functype in initvals:
     results[functype] = CORPSE_solvers.run_models_ODE(Tmin=5.0,Tmax=20.0,thetamin=0.4,thetamax=0.9,
-                                            times=t,inputs={},clay=20.0,initvals=initvals[functype],params=paramsets[functype])
+                                            times=t,inputs={},clay=2.5,initvals=initvals[functype],params=paramsets[functype])

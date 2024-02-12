@@ -76,7 +76,7 @@ def vector_iterate(SOM_init,params,T,theta,inputs,clay,times):
         else:
             theta_step=theta
         # In this case, T, theta, clay, and all the pools in SOM are vectors containing one value per geographical location
-        deriv=CORPSE_deriv.CORPSE_deriv(SOM,T_step,theta_step,params,claymod=CORPSE_deriv.prot_clay(clay.values)/CORPSE_deriv.prot_clay(20))
+        deriv=CORPSE_deriv.CORPSE_deriv(SOM,T_step,theta_step,params,claymod=CORPSE_deriv.prot_clay(clay.values)/CORPSE_deriv.prot_clay(2.5))
 
         # Since we have carbon inputs, these also need to be added to those rates of change with time
         for pool in inputs.keys():
