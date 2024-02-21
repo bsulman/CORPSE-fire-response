@@ -62,6 +62,21 @@ pyplot.subplots_adjust(hspace = 0.2)
 pyplot.show()
 
 
+fig,ax=pyplot.subplots(nrows=1,ncols=1,clear=True,num='CORPSE results')
+for sim in Whitman_sims.results:
+    totalC=CORPSE_array.sumCtypes(Whitman_sims.results[sim][0], 'u')+CORPSE_array.sumCtypes(Whitman_sims.results[sim][0], 'p')
+    ax.plot(Whitman_sims.t*365, Whitman_sims.results[sim][0]['uFastC']/totalC[0]*100, color = 'green', label = 'uFastC')
+    #ax.plot(Whitman_sims.t*365, Whitman_sims.results[sim][0]['uSlowC']/totalC[0]*100, color = 'blue', label = 'uSlowC')
+    ax.plot(Whitman_sims.t*365, Whitman_sims.results[sim][0]['uNecroC']/totalC[0]*100, color = 'orange', label = 'uNecroC')
+    ax.plot(Whitman_sims.t*365, Whitman_sims.results[sim][0]['uPyC']/totalC[0]*100, color = 'purple', label = 'uPyC')
+ax.set_xlabel('Time (days)')
+ax.set_ylabel('Percent of total C')
+ax.legend(fontsize='small')
+ax.set_title('Percent of total C in various pools', y=1, pad=-15)
+
+pyplot.subplots_adjust(hspace = 0.2)
+
+pyplot.show()
 
 
 
