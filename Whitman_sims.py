@@ -8,32 +8,34 @@ import copy
 # There are three kinds of chemically-defined C (Fast, slow, and microbial necromass). "Fast" has higher maximum decomposition rate and microbial CUE
 # Each C type can be in a protected or unprotected state. When protected, it is not subject to microbial decomposition
 SOM_init={'CO2': array(0.0),    # Cumulative CO2 from microbial respiration
- 'livingMicrobeC': array(0.012), # Active, living microbial biomass
- 'pFastC': array(0.18),         # Protected fast-decomposing C
- 'pNecroC': array(0.2),        # Protected microbial necromass C
- 'pSlowC': array(0.6),         # Protected slow-decomposing C
- 'uFastC': array(.1),          # Unprotected fast-decomposing C
- 'uNecroC': array(.1),        # Unprotected microbial necromass C
- 'uSlowC': array(99.0)}         # Unprotected slow-decomposing C
+ 'livingMicrobeC': array(2), # Active, living microbial biomass
+ 'pFastC': array(0.0),         # Protected fast-decomposing C
+ 'pNecroC': array(0.0),        # Protected microbial necromass C
+ 'pSlowC': array(0.0),         # Protected slow-decomposing C
+ 'pPyC': array(0.0),            # Protected PyC
+ 'uFastC': array(2.0),          # Unprotected fast-decomposing C
+ 'uNecroC': array(6.0),        # Unprotected microbial necromass C
+ 'uSlowC': array(90.0),         # Unprotected slow-decomposing C
+ 'uPyC': array(1.0)}            # Unprotected PyC
  
 # Parameters controlling the model
 params={
-    'vmaxref':{'Fast':19.0,'Slow':1.25,'Necro':10}, #  Relative maximum enzymatic decomp rates for each C type (year-1)
-    'Ea':{'Fast':5e3,'Slow':30e3,'Necro':5e3},      # Activation energy (controls T dependence)
-    'kC':{'Fast':0.01,'Slow':0.01,'Necro':0.01},    # Michaelis-Menton half saturation parameter (g microbial biomass/g substrate)
+    'vmaxref':{'Fast':19.0,'Slow':1.25,'Necro':10, 'Py':1.00}, #  Relative maximum enzymatic decomp rates for each C type (year-1)
+    'Ea':{'Fast':5e3,'Slow':30e3,'Necro':5e3, 'Py':5e3},      # Activation energy (controls T dependence)
+    'kC':{'Fast':0.01,'Slow':0.01,'Necro':0.01, 'Py':0.01},    # Michaelis-Menton half saturation parameter (g microbial biomass/g substrate)
     'gas_diffusion_exp':0.6,  # Determines suppression of decomposition at high soil moisture
     'substrate_diffusion_exp':1.5,   # Controls suppression of decomp at low soil moisture
     'minMicrobeC':1e-3,       # Minimum microbial biomass (fraction of total C). Prevents microbes from going extinct and allows some slow decomposition under adverse conditions
     'Tmic':0.25,              # Microbial biomass mean lifetime (years)
     'et':0.6,                 # Fraction of microbial biomass turnover (death) that goes to necromass instead of being immediately mineralized to CO2
-    'eup':{'Fast':0.6,'Slow':0.05,'Necro':0.6},     # Microbial carbon use efficiency for each substrate type (fast, slow, necromass). This amount is converted to biomass during decomposition, and the remainder is immediately respired as CO2
+    'eup':{'Fast':0.6,'Slow':0.05,'Necro':0.6, 'Py':0.01},     # Microbial carbon use efficiency for each substrate type (fast, slow, necromass). This amount is converted to biomass during decomposition, and the remainder is immediately respired as CO2
     'tProtected':75.0,        # Protected C turnover time (years). This is the time scale for which protected C is released back to unprotected state.
-    'protection_rate':{'Fast':0.3,'Slow':0.001,'Necro':1.5}, # Protected carbon formation rate (year-1). Higher number means more will become protected. Can be modified as a function of soil texture/mineralogy to represent different sorption potentials
+    'protection_rate':{'Fast':0.0,'Slow':0.001,'Necro':0, 'Py':0}, # Protected carbon formation rate (year-1). Higher number means more will become protected. Can be modified as a function of soil texture/mineralogy to represent different sorption potentials
     'new_resp_units':True,   # At some point I changed the units of vmaxref to be normalized for other factors so they are actually in year-1 units. Leave this as True values that are easier to interpret.
 }
 
 # This makes an array of all the model time steps (in units of years). In this case, it starts at zero, ends at 120 days, and has a time step of one day
-t=arange(0,90/365,1/365)
+t=arange(0,70/365,1/365)
 
 # This section is setting up different initial values and parameters for different simulations representing microbial community traits
 # Here we set up an empty python dictionary to hold the different sets of parameters and initial values
@@ -101,3 +103,4 @@ results={}
 for functype in initvals:
     results[functype] = CORPSE_solvers.run_models_ODE(Tmin=5.0,Tmax=20.0,thetamin=0.4,thetamax=0.9,
                                             times=t,inputs={},clay=2.5,initvals=initvals[functype],params=paramsets[functype])
+
