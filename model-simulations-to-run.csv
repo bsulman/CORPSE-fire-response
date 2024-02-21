@@ -1,0 +1,9 @@
+﻿simulations to run:,,,,,,,,,,,,,,
+Microbial functional group,Soil type,Burn treatment,clay percent,bulk density,porosity,living MBC,uFactC,uNecroC,uSlowC,"max. enzymatic decomp. (Fast, Necro, Slow)","activation energy (Fast, Necro, Slow)","M-M half saturation (Fast, Necro, Slow)",prot. C turnover time,prot. C formation rate
+One microbial community ,organic soil ,no burn,0,0.2,0.83,2%,,,,,,,0,0
+,,low sev.,0,0.2,0.83,,,,,,,,0,0
+,,high sev.,0,0.2,0.83,,,,,,,,0,0
+,mineral soil,no burn,2.5,1.2,0.55,2%,3,2,95,"20,2,20","0.005, 0.03, 0.005","0.01, 0.01, 0.01",0,0
+,,low sev.,2.5,1.2,0.55,,,,,,,,0,0
+,,high sev.,2.5,1.2,0.55,,,,,,,,0,0
+,,,,,,,,,,,,,,

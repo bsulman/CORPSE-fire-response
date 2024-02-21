@@ -16,7 +16,7 @@ expected_params={	'vmaxref': 'Relative maximum enzymatic decomp rates (length 3)
             }
 
 # Names of the C types. Can edit this to change the number and name of pools in edited model simulations
-chem_types = ['Fast','Slow','Necro']
+chem_types = ['Fast','Slow','Necro', 'Py']
 
 # Makes a list of the pools that should actually be in the model, including both protected and unprotected states
 expected_pools = ['u'+t+'C' for t in chem_types]+\
