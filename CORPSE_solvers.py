@@ -13,6 +13,8 @@ def fsolve_wrapper(SOM_list,T,theta,inputs,clay,params):
     SOM_dict={}
     for n in range(len(fields)):
         SOM_dict[fields[n]]=atleast_1d(SOM_list[n])
+        #SOM_dict[fields[n]]=atleast_1d(SOM_list[fields[n]])
+
 
     # Call the CORPSE model function that returns the derivative (with time) of each pool
     deriv=CORPSE_deriv.CORPSE_deriv(SOM_dict,atleast_1d([T]),atleast_1d([theta]),params,claymod=CORPSE_deriv.prot_clay(clay)/CORPSE_deriv.prot_clay(20))
@@ -76,7 +78,7 @@ def vector_iterate(SOM_init,params,T,theta,inputs,clay,times):
         else:
             theta_step=theta
         # In this case, T, theta, clay, and all the pools in SOM are vectors containing one value per geographical location
-        deriv=CORPSE_deriv.CORPSE_deriv(SOM,T_step,theta_step,params,claymod=CORPSE_deriv.prot_clay(clay.values)/CORPSE_deriv.prot_clay(20))
+        deriv=CORPSE_deriv.CORPSE_deriv(SOM,T_step,theta_step,params,claymod=CORPSE_deriv.prot_clay(clay.values)/CORPSE_deriv.prot_clay(2.5))
 
         # Since we have carbon inputs, these also need to be added to those rates of change with time
         for pool in inputs.keys():
@@ -144,32 +146,35 @@ def run_models_ODE(Tmin,Tmax,thetamin,thetamax,times,inputs,params,clay,initvals
 
     return SOM_out_ODE
 
-# Run a simulation using the explicit iterator instead of the ODE solver. Can edit this function to allow more complex temperature and moisture patterns, among other things
-def run_models_iterator(Tmin,Tmax,thetamin,thetamax,times,inputs,params,clay,initvals):
-    # Iterate explicitly
-    import time
-    from pandas import DataFrame
-    from numpy import arange
-    t0=time.time()
+# # Run a simulation using the explicit iterator instead of the ODE solver. Can edit this function to allow more complex temperature and moisture patterns, among other things
+# def run_models_iterator(Tmin,Tmax,thetamin,thetamax,times,inputs,params,clay,initvals):
+#     # Iterate explicitly
+#     import time
+#     from pandas import DataFrame
+#     from numpy import arange
+#     t0=time.time()
     
-    from numpy import cos,pi
-    T=(cos(times[:,None]*2*pi)+1)*(Tmax.values-Tmin.values)/2+Tmin.values
-    theta=(cos(times[:,None]*2*pi)+1)*(thetamax.values-thetamin.values)/2+thetamin.values
+#     from numpy import cos,pi
+#     T=(cos(times[:,None]*2*pi)+1)*(Tmax.values-Tmin.values)/2+Tmin.values
+#     theta=(cos(times[:,None]*2*pi)+1)*(thetamax.values-thetamin.values)/2+thetamin.values
     
-    dt=times[1]-times[0]
-    result_iterator=vector_iterate(initvals,params,T+273.15,theta,inputs,clay,times)
-    SOM_out_iterator=[]
-    for point in range(len(Tmin)):
-        df=DataFrame(index=times,columns=fields)
-        for field in result_iterator.keys():
-            df[field]=result_iterator[field][point,:]
-        # df['livingMicrobeN']=df['livingMicrobeC']/params['CN_microbe']
-        SOM_out_iterator.append(df)
+#     dt=times[1]-times[0]
+#     result_iterator=vector_iterate(initvals,params,T+273.15,theta,inputs,clay,times)
+#     SOM_out_iterator=[]
+#     for point in range(len(Tmin)):
+#         df=DataFrame(index=times,columns=fields)
+#         for field in result_iterator.keys():
+#             df[field]=result_iterator[field][point,:]
+#         # df['livingMicrobeN']=df['livingMicrobeC']/params['CN_microbe']
+#         SOM_out_iterator.append(df)
 
-    print('Time elapsed: %1.1f s'%(time.time()-t0))
-    return SOM_out_iterator
+#     print('Time elapsed: %1.1f s'%(time.time()-t0))
+#     return SOM_out_iterator
 
 # Functions for adding together all the C pools. They work on either dictionary or dataframe data types because both have the same names for the pools
-def totalCarbon(SOM):
-    return SOM['uFastC']+SOM['uSlowC']+SOM['uNecroC']+SOM['pFastC']+SOM['pSlowC']+SOM['pNecroC']+SOM['livingMicrobeC']
+def totalCarbon(SOM, microbial_pools):
+    totalMBC=0
+    for m in microbial_pools:
+        totalMBC=totalMBC+SOM[m]
+    return SOM['uFastC']+SOM['uSlowC']+SOM['uNecroC']+SOM['uPyC']+SOM['pFastC']+SOM['pSlowC']+SOM['pNecroC']+SOM['pPyC']+totalMBC
     

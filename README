@@ -1,14 +1,8 @@
 Scripts for running the CORPSE model:
-CORPSE_array.py:   Defines the CORPSE model
+CORPSE_array.py:	Defines the CORPSE model with up to 4 discrete microbial functional groups
+CORPSE_solvers.py:	Functions for running the CORPSE model. Includes two approaches for running the model. One uses the python ordinary differential equation (ODE) solver. The other explicitly iterates the model using a fixed time step.
+Whitman_sims.py:	This script is used to set initial post-burn parameters for CORPSE model. Includes up to four discrete microbial functional groups. Model can be run with fewer than 4 functional groups by setting MBC for a given pool equal to 0. 
 
-CORPSE_solvers.py: Functions for running the CORPSE model. 
-                   Includes two approaches for running the model. One uses the python ordinary differential equation (ODE) solver. 
-                   The other explicitly iterates the model using a fixed time step.
-                   
-Whitman_sims.py:   This script was used for generating the preliminary figures and simulations from the DOE proposal, and can be a starting point
-                   for developing new simulations for the project.
-                   
-                   
 These scripts have been tested using python 3.7.6 and the following packages:
 matplotlib 3.1.2
 pandas 0.25.3
@@ -18,4 +12,4 @@ scipy 1.4.1
 One good way to install working versions of all these packages (if you don't already have them) is to install Anaconda: https://www.anaconda.com/products/individual
 
 Once you have the packages installed, you should be able to run the scripts and produce the plot of results by running:
-python Whitman_sims.py
+python plots.py
